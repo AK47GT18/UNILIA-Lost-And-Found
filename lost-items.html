@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found - Lost Items</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .navbar {
+      transition: all 0.3s ease;
+    }
+    .navbar-sticky {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 50;
+      background-color: rgba(30, 58, 138, 0.95);
+      backdrop-filter: blur(10px);
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -2px;
+      left: 0;
+      background-color: #2DD4BF;
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .item-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+    .slide-in {
+      animation: slideIn 0.8s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 640px) {
+      .nav-menu {
+        display: none;
+      }
+      .nav-menu.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: rgba(30, 58, 138, 0.95);
+        padding: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .nav-menu a {
+        padding: 0.75rem 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Navbar -->
+  <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
+    <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
+    <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </button>
+    <div class="nav-menu flex items-center space-x-6 sm:flex">
+      <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+      <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+      <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+      <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
+      <a href="login.html" class="px-4 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 hidden" id="login-btn">Login</a>
+      <a href="register.html" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300">Sign Up</a>
+    </div>
+  </nav>
+
+  <!-- Lost Items Section -->
+  <section class="py-16 px-4">
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-6 text-center fade-in">Lost & Found Items</h1>
+      <p class="text-base sm:text-lg text-gray-600 mb-12 text-center max-w-xl mx-auto slide-in">
+        Browse lost and found items, filter by category, or search to find specific items.
+      </p>
+
+      <!-- Filter and Search -->
+      <div class="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0 sm:space-x-4">
+        <div class="w-full sm:w-1/3">
+          <label for="category" class="block text-sm font-medium text-gray-700">Filter by Category</label>
+          <select id="category" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+            <option value="all">All Categories</option>
+            <option value="electronics">Electronics</option>
+            <option value="clothing">Clothing</option>
+            <option value="books">Books</option>
+            <option value="accessories">Accessories</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="w-full sm:w-1/3">
+          <label for="search" class="block text-sm font-medium text-gray-700">Search Items</label>
+          <input type="text" id="search" placeholder="Search by item name or description..." class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+        </div>
+      </div>
+
+      <!-- Item Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        <div class="item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <div class="h-40 bg-gray-200 rounded-lg mb-4"></div> <!-- Image Placeholder -->
+          <h3 class="text-lg font-semibold text-gray-800">Blue Backpack</h3>
+          <p class="text-sm text-gray-600 mb-2">Found near library, contains books</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> Accessories</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Status:</strong> Pending</p>
+          <p class="text-sm text-gray-600 mb-4"><strong>Posted:</strong> Sep 6, 2025</p>
+          <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Claim Item</button>
+        </div>
+        <div class="item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <div class="h-40 bg-gray-200 rounded-lg mb-4"></div> <!-- Image Placeholder -->
+          <h3 class="text-lg font-semibold text-gray-800">Lost Keys</h3>
+          <p class="text-sm text-gray-600 mb-2">Car keys with red keychain</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> Accessories</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Status:</strong> Approved</p>
+          <p class="text-sm text-gray-600 mb-4"><strong>Posted:</strong> Sep 5, 2025</p>
+          <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Claim Item</button>
+        </div>
+        <div class="item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <div class="h-40 bg-gray-200 rounded-lg mb-4"></div> <!-- Image Placeholder -->
+          <h3 class="text-lg font-semibold text-gray-800">Laptop Charger</h3>
+          <p class="text-sm text-gray-600 mb-2">Black Dell charger, left in lecture hall</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> Electronics</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Status:</strong> Pending</p>
+          <p class="text-sm text-gray-600 mb-4"><strong>Posted:</strong> Sep 4, 2025</p>
+          <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Claim Item</button>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="flex justify-center items-center space-x-4">
+        <button id="prev-page" class="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors duration-300 disabled:opacity-50" disabled>Previous</button>
+        <span class="text-gray-800">Page 1 of 3</span>
+        <button id="next-page" class="px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 transition-colors duration-300">Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-blue-900 text-white py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-lg font-bold mb-4">Lost & Found</h3>
+          <p class="text-gray-300 text-sm">Connecting students with their belongings since 2025.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="index.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Home</a></li>
+            <li><a href="lost-items.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Lost Items</a></li>
+            <li><a href="contact.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005 1.016-3.125 1.25-.897-.957-2.178-1.555-3.594-1.555-2.72 0-4.92 2.2-4.92 4.92 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.708.869 3.215 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"></path></svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.326 3.608 1.301.975.975 1.24 2.242 1.301 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.326 2.633-1.301 3.608-.975.975-2.242 1.24-3.608 1.301-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.326-3.608-1.301-.975-.975-1.24-2.242-1.301-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.326-2.633 1.301-3.608.975-.975 2.242-1.24 3.608-1.301 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.627.074-3.043.468-4.189 1.614-1.146 1.146-1.54 2.562-1.614 4.189-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.074 1.627.468 3.043 1.614 4.189 1.146 1.146 2.562 1.54 4.189 1.614 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.627-.074 3.043-.468 4.189-1.614 1.146-1.146 1.54-2.562 1.614-4.189.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.074-1.627-.468-3.043-1.614-4.189-1.146-1.146-2.562-1.54-4.189-1.614-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.441s.645 1.441 1.441 1.441 1.441-.645 1.441-1.441-.645-1.441-1.441-1.441z"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 text-center text-gray-300 text-sm">
+        &copy; 2025 Lost & Found. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript for Navbar, Filter, Search, and Pagination -->
+  <script>
+    // Sticky Navbar
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('navbar-sticky');
+      } else {
+        navbar.classList.remove('navbar-sticky');
+      }
+    });
+
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+
+    // Simulate Login State (Assuming user is logged in)
+    const isLoggedIn = true;
+    if (isLoggedIn) {
+      document.getElementById('login-btn').classList.add('hidden');
+      document.getElementById('profile-link').classList.remove('hidden');
+    }
+
+    // Sample Data for Items
+    const items = [
+      { id: 1, name: 'Blue Backpack', description: 'Found near library, contains books', category: 'Accessories', status: 'Pending', posted: 'Sep 6, 2025' },
+      { id: 2, name: 'Lost Keys', description: 'Car keys with red keychain', category: 'Accessories', status: 'Approved', posted: 'Sep 5, 2025' },
+      { id: 3, name: 'Laptop Charger', description: 'Black Dell charger, left in lecture hall', category: 'Electronics', status: 'Pending', posted: 'Sep 4, 2025' },
+      // Add more items for pagination simulation
+      { id: 4, name: 'Textbook', description: 'Calculus book, left in cafeteria', category: 'Books', status: 'Approved', posted: 'Sep 3, 2025' },
+      { id: 5, name: 'Jacket', description: 'Blue denim jacket, found in lecture hall', category: 'Clothing', status: 'Pending', posted: 'Sep 2, 2025' },
+      { id: 6, name: 'Phone', description: 'iPhone 12, found near gym', category: 'Electronics', status: 'Approved', posted: 'Sep 1, 2025' },
+    ];
+
+    // Pagination Settings
+    const itemsPerPage = 3;
+    let currentPage = 1;
+
+    // DOM Elements
+    const itemGrid = document.querySelector('.grid');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageInfo = document.querySelector('.flex span');
+    const categoryFilter = document.getElementById('category');
+    const searchInput = document.getElementById('search');
+
+    // Render Items
+    function renderItems(pageItems) {
+      itemGrid.innerHTML = '';
+      pageItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in';
+        card.innerHTML = `
+          <div class="h-40 bg-gray-200 rounded-lg mb-4"></div>
+          <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
+          <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> ${item.category}</p>
+          <p class="text-sm text-gray-600 mb-2"><strong>Status:</strong> ${item.status}</p>
+          <p class="text-sm text-gray-600 mb-4"><strong>Posted:</strong> ${item.posted}</p>
+          <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Claim Item</button>
+        `;
+        itemGrid.appendChild(card);
+      });
+    }
+
+    // Update Pagination
+    function updatePagination(filteredItems) {
+      const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+      const start = (currentPage - 1) * itemsPerPage;
+      const pageItems = filteredItems.slice(start, start + itemsPerPage);
+      renderItems(pageItems);
+    }
+
+    // Filter and Search Logic
+    function filterItems() {
+      const category = categoryFilter.value;
+      const search = searchInput.value.toLowerCase();
+      const filteredItems = items.filter(item => {
+        const matchesCategory = category === 'all' || item.category === category;
+        const matchesSearch = item.name.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+      });
+      currentPage = 1; // Reset to first page on filter change
+      updatePagination(filteredItems);
+    }
+
+    // Initial Render
+    updatePagination(items);
+
+    // Event Listeners
+    categoryFilter.addEventListener('change', filterItems);
+    searchInput.addEventListener('input', filterItems);
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        filterItems();
+      }
+    });
+    nextPageBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(items.filter(item => {
+        const category = categoryFilter.value;
+        const search = searchInput.value.toLowerCase();
+        const matchesCategory = category === 'all' || item.category === category;
+        const matchesSearch = item.name.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
+        return matchesCategory && matchesSearch;
+      }).length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        filterItems();
+      }
+    });
+  </script>
+
+</body>
+</html>

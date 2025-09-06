@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found - Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .sidebar {
+      transition: transform 0.3s ease;
+    }
+    .sidebar-hidden {
+      transform: translateX(-100%);
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+    .slide-in {
+      animation: slideIn 0.8s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 50;
+        width: 75%;
+        height: 100%;
+        background-color: rgba(30, 58, 138, 0.95);
+        backdrop-filter: blur(10px);
+      }
+      .sidebar-hidden {
+        display: none;
+      }
+      .table-container {
+        overflow-x: auto;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar w-64 bg-blue-900 text-white h-screen p-6 md:fixed md:top-0 md:left-0 md:flex md:flex-col sidebar-hidden md:sidebar">
+    <div class="text-2xl font-bold tracking-tight mb-8">Lost & Found Admin</div>
+    <nav class="flex-1">
+      <ul class="space-y-4">
+        <li><a href="#dashboard" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg><span>Dashboard</span></a></li>
+        <li><a href="#user-management" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg><span>User Management</span></a></li>
+        <li><a href="#item-management" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg><span>Item Management</span></a></li>
+        <li><a href="#reports" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m6 2v-6m6 6v-8m-12 8V7"></path></svg><span>Reports</span></a></li>
+        <li><a href="#notifications" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg><span>Notifications</span></a></li>
+        <li><a href="#settings" class="flex items-center space-x-2 px-4 py-2 text-white hover:bg-teal-500 rounded-lg transition-colors duration-300"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37 1 .608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg><span>Settings</span></a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="md:ml-64">
+    <!-- Navbar -->
+    <nav class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg">
+      <button id="sidebar-toggle" class="md:hidden text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <div class="text-2xl font-bold tracking-tight md:hidden">Lost & Found</div>
+      <div class="flex items-center space-x-6">
+        <a href="index.html" class="px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+        <a href="lost-items.html" class="px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+        <a href="contact.html" class="px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+        <a href="profile.html" class="px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
+        <a href="admin.html" class="px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Admin</a>
+        <a href="login.html" class="px-4 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 hidden" id="login-btn">Login</a>
+      </div>
+    </nav>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="py-16 px-4">
+      <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-6 text-center fade-in">Admin Dashboard</h1>
+        <p class="text-base sm:text-lg text-gray-600 mb-12 text-center max-w-xl mx-auto slide-in">
+          Monitor and manage all lost and found activities efficiently.
+        </p>
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+          <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+            <h3 class="text-lg font-semibold text-gray-800">Total Items Posted</h3>
+            <p class="text-3xl font-bold text-teal-500">150</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+            <h3 class="text-lg font-semibold text-gray-800">Items Collected</h3>
+            <p class="text-3xl font-bold text-teal-500">90</p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+            <h3 class="text-lg font-semibold text-gray-800">Items Uncollected</h3>
+            <p class="text-3xl font-bold text-teal-500">60</p>
+          </div>
+        </div>
+        <!-- Graphs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Item Status Distribution</h3>
+            <canvas id="itemStatusChart" class="w-full h-64"></canvas>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">User Activity</h3>
+            <canvas id="userActivityChart" class="w-full h-64"></canvas>
+          </div>
+        </div>
+        <!-- Item Management Table -->
+        <div id="item-management" class="table-container bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6">Item Management</h2>
+          <table class="w-full text-left text-sm sm:text-base">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="p-3">Item</th>
+                <th class="p-3">Description</th>
+                <th class="p-3">Status</th>
+                <th class="p-3">Posted By</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t">
+                <td class="p-3">Blue Backpack</td>
+                <td class="p-3">Found near library, contains books</td>
+                <td class="p-3">Pending</td>
+                <td class="p-3">John Doe</td>
+                <td class="p-3">
+                  <button class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors duration-300 mr-2">Approve</button>
+                  <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-300">Delete</button>
+                </td>
+              </tr>
+              <tr class="border-t">
+                <td class="p-3">Lost Keys</td>
+                <td class="p-3">Car keys with red keychain</td>
+                <td class="p-3">Approved</td>
+                <td class="p-3">Jane Smith</td>
+                <td class="p-3">
+                  <button class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors duration-300 mr-2">Approve</button>
+                  <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-300">Delete</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- User Management Section -->
+    <section id="user-management" class="py-16 px-4 bg-white">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 fade-in">User Management</h2>
+        <div class="table-container bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <table class="w-full text-left text-sm sm:text-base">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="p-3">Name</th>
+                <th class="p-3">Email</th>
+                <th class="p-3">Role</th>
+                <th class="p-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t">
+                <td class="p-3">John Doe</td>
+                <td class="p-3">john.doe@example.com</td>
+                <td class="p-3">User</td>
+                <td class="p-3">
+                  <button class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors duration-300 mr-2">Edit</button>
+                  <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-300">Ban</button>
+                </td>
+              </tr>
+              <tr class="border-t">
+                <td class="p-3">Jane Smith</td>
+                <td class="p-3">jane.smith@example.com</td>
+                <td class="p-3">Admin</td>
+                <td class="p-3">
+                  <button class="px-3 py-1 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors duration-300 mr-2">Edit</button>
+                  <button class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-300">Ban</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports Section -->
+    <section id="reports" class="py-16 px-4 bg-gray-50">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 fade-in">Reports</h2>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <p class="text-gray-600 mb-4">Generate reports on item recovery rates, user activity, and more.</p>
+          <button class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Generate Report</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notifications Section -->
+    <section id="notifications" class="py-16 px-4 bg-white">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 fade-in">Notifications</h2>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <ul class="space-y-4">
+            <li class="border-b pb-4">
+              <p class="text-gray-600">New item reported: Blue Backpack (Pending Approval)</p>
+              <p class="text-sm text-gray-500">Posted by John Doe on Sep 6, 2025</p>
+            </li>
+            <li class="border-b pb-4">
+              <p class="text-gray-600">User Jane Smith updated profile</p>
+              <p class="text-sm text-gray-500">Sep 5, 2025</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="settings" class="py-16 px-4 bg-gray-50">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-6 fade-in">Settings</h2>
+        <div class="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in">
+          <form>
+            <div class="mb-4">
+              <label for="site-name" class="block text-sm font-medium text-gray-700">Site Name</label>
+              <input type="text" id="site-name" name="site-name" value="Lost & Found" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+            </div>
+            <div class="mb-4">
+              <label for="email-notifications" class="block text-sm font-medium text-gray-700">Admin Email Notifications</label>
+              <input type="email" id="email-notifications" name="email-notifications" value="admin@lostandfound.com" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+            </div>
+            <button type="submit" class="px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">Save Settings</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-blue-900 text-white py-8">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+        <div>
+          <h3 class="text-lg font-bold mb-4">Lost & Found</h3>
+          <p class="text-gray-300 text-sm">Connecting students with their belongings since 2025.</p>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+          <ul class="space-y-2 text-sm">
+            <li><a href="index.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Home</a></li>
+            <li><a href="lost-items.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Lost Items</a></li>
+            <li><a href="contact.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+          <div class="flex space-x-4">
+            <a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005 1.016-3.125 1.25-.897-.957-2.178-1.555-3.594-1.555-2.72 0-4.92 2.2-4.92 4.92 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.708.869 3.215 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"></path></svg>
+            </a>
+            <a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 1.366.062 2.633.326 3.608 1.301.975.975 1.24 2.242 1.301 3.608.058 1.266.07 1.646.07 4.85s-.012 3.584-.07 4.85c-.062 1.366-.326 2.633-1.301 3.608-.975.975-2.242 1.24-3.608 1.301-1.266.058-1.646.07-4.85.07s-3.584-.012-4.85-.07c-1.366-.062-2.633-.326-3.608-1.301-.975-.975-1.24-2.242-1.301-3.608-.058-1.266-.07-1.646-.07-4.85s.012-3.584.07-4.85c.062-1.366.326-2.633 1.301-3.608.975-.975 2.242-1.24 3.608-1.301 1.266-.058 1.646-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-1.627.074-3.043.468-4.189 1.614-1.146 1.146-1.54 2.562-1.614 4.189-.058 1.28-.072 1.688-.072 4.947s.014 3.667.072 4.947c.074 1.627.468 3.043 1.614 4.189 1.146 1.146 2.562 1.54 4.189 1.614 1.28.058 1.688.072 4.947.072s3.667-.014 4.947-.072c1.627-.074 3.043-.468 4.189-1.614 1.146-1.146 1.54-2.562 1.614-4.189.058-1.28.072-1.688.072-4.947s-.014-3.667-.072-4.947c-.074-1.627-.468-3.043-1.614-4.189-1.146-1.146-2.562-1.54-4.189-1.614-1.28-.058-1.688-.072-4.947-.072zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.441s.645 1.441 1.441 1.441 1.441-.645 1.441-1.441-.645-1.441-1.441-1.441z"></path></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="mt-8 text-center text-gray-300 text-sm">
+        &copy; 2025 Lost & Found. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript for Sidebar and Charts -->
+  <script>
+    // Sidebar Toggle
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('sidebar-hidden');
+    });
+
+    // Simulate Login State (Assuming admin is logged in)
+    const isLoggedIn = true;
+    if (isLoggedIn) {
+      document.getElementById('login-btn').classList.add('hidden');
+      document.getElementById('profile-link').classList.remove('hidden');
+    }
+
+    // Item Status Chart (Pie)
+    const itemStatusChart = new Chart(document.getElementById('itemStatusChart'), {
+      type: 'pie',
+      data: {
+        labels: ['Pending', 'Approved', 'Collected'],
+        datasets: [{
+          data: [60, 50, 40],
+          backgroundColor: ['#6B7280', '#2DD4BF', '#1E3A8A'],
+          borderColor: '#FFFFFF',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+
+    // User Activity Chart (Bar)
+    const userActivityChart = new Chart(document.getElementById('userActivityChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+          label: 'Items Posted',
+          data: [20, 30, 25, 40, 35, 50],
+          backgroundColor: '#2DD4BF',
+          borderColor: '#1E3A8A',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
