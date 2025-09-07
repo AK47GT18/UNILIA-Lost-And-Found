@@ -331,39 +331,31 @@
     }
 
     // Load user profile data
-    async function loadUserProfile() {
-      try {
-        // Set email (readonly)
-        document.getElementById('email').value = currentUser.email;
-        
-        // Check email verification status
-        const emailStatus = document.getElementById('email-status');
-        if (currentUser.email_confirmed_at) {
-          emailStatus.textContent = 'Email verified';
-          emailStatus.className = 'text-green-500';
-        }
-
-        // Load profile data from profiles table
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', currentUser.id)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
-
-        if (profile) {
-          document.getElementById('name').value = profile.full_name || '';
-          document.getElementById('phone').value = profile.whatsapp || '';
-        }
-
-      } catch (error) {
-        console.error('Error loading profile:', error);
-        showMessage(profileMessage, 'Error loading profile data.', 'error');
-      }
+   async function loadUserProfile() {
+  try {
+    document.getElementById('email').value = currentUser.email;
+    const emailStatus = document.getElementById('email-status');
+    if (currentUser.email_confirmed_at) {
+      emailStatus.textContent = 'Email verified';
+      emailStatus.className = 'text-green-500';
     }
+    const { data: profile, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', currentUser.id)
+      .single();
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+    if (profile) {
+      document.getElementById('name').value = profile.full_name || '';
+      document.getElementById('phone').value = profile.whatsapp || '';
+    }
+  } catch (error) {
+    console.error('Error loading profile:', error);
+    showMessage(profileMessage, 'Error loading profile data.', 'error');
+  }
+}
 
     // Load user items
     async function loadUserItems() {
