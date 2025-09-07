@@ -124,11 +124,23 @@
     <div class="max-w-6xl mx-auto">
       <h1 class="text-3xl sm:text-5xl font-extrabold text-blue-900 mb-6 text-center fade-in">Lost & Found Items</h1>
       <p class="text-base sm:text-lg text-gray-600 mb-12 text-center max-w-xl mx-auto slide-in">
-        Browse lost and found items or search to find specific items.
+        Browse lost and found items, filter by category or status, or search to find specific items.
       </p>
 
       <!-- Filter and Search -->
       <div class="flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0 sm:space-x-4">
+        <div class="w-full sm:w-1/3">
+          <label for="category-filter" class="block text-sm font-medium text-gray-700">Filter by Category</label>
+          <select id="category-filter" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+            <option value="all">All Categories</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Clothing">Clothing</option>
+            <option value="Books">Books</option>
+            <option value="Accessories">Accessories</option>
+            <option value="Documents">Documents</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
         <div class="w-full sm:w-1/3">
           <label for="status-filter" class="block text-sm font-medium text-gray-700">Filter by Status</label>
           <select id="status-filter" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
@@ -217,6 +229,7 @@
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
     const pageInfo = document.getElementById('page-info');
+    const categoryFilter = document.getElementById('category-filter');
     const statusFilter = document.getElementById('status-filter');
     const searchInput = document.getElementById('search');
     const menuToggle = document.getElementById('menu-toggle');
@@ -255,11 +268,11 @@
         const { data, error } = await supabase
           .from('lost_items')
           .select(`
-            id, title, description, location, status, image_url, created_at, updated_at,
+            id, title, description, location, status, image_url, created_at, category, contact_info, date_lost,
             users (whatsapp)
           `)
           .neq('status', 'claimed')
-          .or(`status.eq.claimed,updated_at.gte.${oneDayAgo}`)
+          .or(`status.eq.claimed,created_at.gte.${oneDayAgo}`)
           .order('created_at', { ascending: false });
         if (error) {
           throw new Error(`Failed to fetch items: ${error.message} (code: ${error.code})`);
@@ -317,8 +330,11 @@
               ${item.status.charAt(0).toUpperCase() + item.status.slice(1)}
             </span>
           </div>
-          <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+          <p class="text-sm text-gray-600 mb-2">${item.description || 'No description provided'}</p>
+          ${item.category ? `<p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> ${item.category}</p>` : ''}
           ${item.location ? `<p class="text-sm text-gray-600 mb-2"><strong>Location:</strong> ${item.location}</p>` : ''}
+          ${item.date_lost ? `<p class="text-sm text-gray-600 mb-2"><strong>Date Lost:</strong> ${new Date(item.date_lost).toLocaleDateString()}</p>` : ''}
+          ${item.contact_info ? `<p class="text-sm text-gray-600 mb-2"><strong>Contact Info:</strong> ${item.contact_info}</p>` : ''}
           <p class="text-sm text-gray-600 mb-4"><strong>Posted:</strong> ${new Date(item.created_at).toLocaleDateString()}</p>
           ${item.users?.whatsapp ? `
             <button onclick="${buttonAction}" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-transform duration-300 transform hover:scale-105">${buttonText}</button>
@@ -330,12 +346,14 @@
 
     // Filter and Search Logic
     function filterItems() {
+      const category = categoryFilter.value;
       const status = statusFilter.value;
       const search = searchInput.value.toLowerCase();
       const filteredItems = items.filter(item => {
+        const matchesCategory = category === 'all' || item.category === category;
         const matchesStatus = status === 'all' || item.status === status;
-        const matchesSearch = item.title.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
-        return matchesStatus && matchesSearch;
+        const matchesSearch = item.title.toLowerCase().includes(search) || (item.description || '').toLowerCase().includes(search);
+        return matchesCategory && matchesStatus && matchesSearch;
       });
       currentPage = 1; // Reset to first page
       updatePagination(filteredItems);
@@ -376,6 +394,7 @@
     });
 
     // Event Listeners
+    categoryFilter.addEventListener('change', filterItems);
     statusFilter.addEventListener('change', filterItems);
     searchInput.addEventListener('input', filterItems);
     prevPageBtn.addEventListener('click', () => {
@@ -386,11 +405,13 @@
     });
     nextPageBtn.addEventListener('click', () => {
       const totalPages = Math.ceil(items.filter(item => {
+        const category = categoryFilter.value;
         const status = statusFilter.value;
         const search = searchInput.value.toLowerCase();
+        const matchesCategory = category === 'all' || item.category === category;
         const matchesStatus = status === 'all' || item.status === status;
-        const matchesSearch = item.title.toLowerCase().includes(search) || item.description.toLowerCase().includes(search);
-        return matchesStatus && matchesSearch;
+        const matchesSearch = item.title.toLowerCase().includes(search) || (item.description || '').toLowerCase().includes(search);
+        return matchesCategory && matchesStatus && matchesSearch;
       }).length / itemsPerPage);
       if (currentPage < totalPages) {
         currentPage++;
