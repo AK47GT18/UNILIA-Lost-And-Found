@@ -27,9 +27,11 @@
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-teal-50 min-h-screen flex items-center justify-center">
+  <div id="loading-screen" class="fixed inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+  </div>
   
-  <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg text-center fade-in">
-    <!-- Success Icon -->
+  <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg text-center fade-in hidden" id="content">
     <div class="mb-6">
       <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center bounce">
         <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,43 +59,47 @@
   </div>
 
   <script type="module">
-    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
-    
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+
     const SUPABASE_URL = "https://wooxhjsckxfajsupiuge.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3hoanNja3hmYWpzdXBpdWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNzk0ODcsImV4cCI6MjA3Mjc1NTQ4N30.Lo2DeJmSeD0Wm0yVjpXuuDEy9Y_d7bTy3VOK-F8TxzY";
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
+
     const statusDiv = document.getElementById('verification-status');
-    
-    // Handle the verification
+    const loadingScreen = document.getElementById('loading-screen');
+    const content = document.getElementById('content');
+
     async function handleEmailVerification() {
       try {
-        // Get the current user
         const { data: { user }, error } = await supabase.auth.getUser();
-        
         if (error) throw error;
-        
-        if (user) {
-          // User is verified
-          statusDiv.innerHTML = `
-            <div class="text-green-600">
-              <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <p class="text-sm font-medium">Verification Complete!</p>
-              <p class="text-xs text-gray-500">Welcome to Lost & Found, ${user.email}</p>
-            </div>
-          `;
-          
-          // Auto redirect after 3 seconds
-          setTimeout(() => {
-            window.location.href = 'profile.html';
-          }, 3000);
-          
-        } else {
-          throw new Error('No user found');
+        if (!user) throw new Error('No user found');
+
+        // Optional: Verify user exists in users table
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('id, full_name')
+          .eq('id', user.id)
+          .single();
+        if (profileError || !profile) {
+          console.warn('User not found in users table:', profileError?.message);
         }
-        
+
+        statusDiv.innerHTML = `
+          <div class="text-green-600">
+            <svg class="w-6 h-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+            <p class="text-sm font-medium">Verification Complete!</p>
+            <p class="text-xs text-gray-500">Welcome to Lost & Found, ${user.email}</p>
+          </div>
+        `;
+        content.classList.remove('hidden');
+        loadingScreen.classList.add('hidden');
+
+        setTimeout(() => {
+          window.location.href = 'profile.html';
+        }, 3000);
       } catch (error) {
         console.error('Verification error:', error);
         statusDiv.innerHTML = `
@@ -102,23 +108,27 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
             <p class="text-sm font-medium">Verification Error</p>
-            <p class="text-xs text-gray-500">Please try logging in manually</p>
+            <p class="text-xs text-gray-500">${
+              error.message.includes('No user') || error.message.includes('Invalid token')
+                ? 'Invalid or expired verification link. Please try logging in or request a new verification email.'
+                : 'An error occurred. Please try again or contact support.'
+            }</p>
+            <a href="login.html" class="mt-2 inline-block text-sm text-teal-500 hover:text-teal-600">Go to Login</a>
           </div>
         `;
+        content.classList.remove('hidden');
+        loadingScreen.classList.add('hidden');
       }
     }
-    
-    // Check URL hash for verification tokens
+
     const urlHash = window.location.hash;
     if (urlHash && urlHash.includes('access_token')) {
-      // Handle the auth callback
       supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'SIGNED_IN' && session) {
+        if (event === 'SIGNED_IN' && session && window.location.pathname !== '/profile.html') {
           handleEmailVerification();
         }
       });
     } else {
-      // No verification token, check if user is already logged in
       handleEmailVerification();
     }
   </script>
