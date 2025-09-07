@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lost & Found - Sign Up</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Signup Section -->
+  <section class="py-16 px-4">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md">
+      <h1 class="text-3xl font-extrabold text-blue-900 mb-6 text-center">Sign Up</h1>
+      <p class="text-base text-gray-600 mb-8 text-center">Create an account to start posting and claiming lost or found items.</p>
+      
+      <form id="signup-form">
+        <div class="mb-4">
+          <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+          <input type="text" id="name" name="name" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" id="email" name="email" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="phone" class="block text-sm font-medium text-gray-700">Phone (WhatsApp-enabled, e.g., +1234567890)</label>
+          <input type="tel" id="phone" name="phone" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required>
+        </div>
+        <div class="mb-4">
+          <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+          <input type="password" id="password" name="password" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required>
+        </div>
+        <div class="mb-6">
+          <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirm-password" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500" required>
+        </div>
+        <button type="submit" id="submit-btn" class="w-full px-6 py-3 bg-teal-500 text-white font-semibold rounded-lg hover:bg-teal-600 transition-all duration-300">Create Account</button>
+      </form>
+      
+      <p class="mt-6 text-center text-sm text-gray-600">
+        Already have an account? <a href="login.html" class="text-teal-500 hover:text-teal-600">Login</a>
+      </p>
+      <p id="error-message" class="mt-4 text-center text-sm hidden"></p>
+      <p id="success-message" class="mt-4 text-center text-sm text-green-600 hidden"></p>
+    </div>
+  </section>
+
+  <!-- Load Supabase using ES modules -->
+  <script type="module">
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
+    
+    // Initialize Supabase
+    const SUPABASE_URL = "https://wooxhjsckxfajsupiuge.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3hoanNja3hmYWpzdXBpdWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNzk0ODcsImV4cCI6MjA3Mjc1NTQ4N30.Lo2DeJmSeD0Wm0yVjpXuuDEy9Y_d7bTy3VOK-F8TxzY";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    console.log('Supabase initialized:', supabase);
+
+    // Register Function
+    async function register(email, password, name, whatsapp) {
+      console.log('Attempting to register user:', email);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: 'https://ak47gt18.github.io/UNILIA-Lost-And-Found/verify.html',
+          data: {
+            full_name: name,
+            whatsapp: whatsapp
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('Registration error:', error);
+        throw new Error(error.message);
+      }
+      
+      console.log('Registration successful:', data);
+      
+      // If user is created, save additional profile data
+      if (data.user) {
+        try {
+          await saveProfile(data.user.id, name, whatsapp);
+        } catch (profileError) {
+          console.error('Profile save error:', profileError);
+          // Don't throw here as the user was created successfully
+        }
+      }
+      
+      return data;
+    }
+
+    // Save Profile Function
+    async function saveProfile(userId, name, whatsapp) {
+      console.log('Saving profile for user:', userId);
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .upsert({ 
+          id: userId, 
+          full_name: name, 
+          whatsapp: whatsapp 
+        });
+        
+      if (error) {
+        console.error('Profile save error:', error);
+        throw new Error(error.message);
+      }
+      
+      console.log('Profile saved:', data);
+      return data;
+    }
+
+    // Form handling
+    const form = document.getElementById('signup-form');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Hide previous messages
+      errorMessage.classList.add('hidden');
+      successMessage.classList.add('hidden');
+      
+      // Get form data
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+
+      // Validation
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      const phoneRegex = /^\+\d{9,15}$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
+      const errors = [];
+
+      if (!name) errors.push('Full name is required.');
+      if (!emailRegex.test(email)) errors.push('Please enter a valid email address.');
+      if (!phoneRegex.test(phone)) errors.push('Please enter a valid phone number (e.g., +1234567890).');
+      if (!passwordRegex.test(password)) errors.push('Password must be at least 6 characters with uppercase, lowercase, and a number.');
+      if (password !== confirmPassword) errors.push('Passwords do not match.');
+
+      if (errors.length > 0) {
+        errorMessage.innerHTML = errors.join('<br>');
+        errorMessage.classList.remove('hidden');
+        return;
+      }
+
+      // Submit
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+
+      try {
+        await register(email, password, name, phone);
+        
+        successMessage.textContent = 'Account created successfully! Please check your email to verify your account.';
+        successMessage.classList.remove('hidden');
+        
+        // Reset form
+        form.reset();
+        
+        // Redirect after delay
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 3000);
+        
+      } catch (err) {
+        console.error('Signup error:', err);
+        errorMessage.textContent = err.message || 'Signup failed. Please try again.';
+        errorMessage.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -79,6 +79,11 @@
         padding: 0.75rem 0;
       }
     }
+    #image-preview {
+      max-height: 150px;
+      object-fit: cover;
+      display: none;
+    }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -96,8 +101,6 @@
       <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
       <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
       <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
-      <a href="login.html" class="px-4 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 hidden" id="login-btn">Login</a>
-      <a href="signup.html" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300">Sign Up</a>
     </div>
   </nav>
 
@@ -224,6 +227,11 @@
             <option value="Other">Other</option>
           </select>
         </div>
+        <div class="mb-4">
+          <label for="item-image" class="block text-sm font-medium text-gray-700">Item Image (Optional)</label>
+          <input type="file" id="item-image" name="item-image" accept="image/*" class="mt-1 p-3 w-full border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+          <img id="image-preview" class="mt-2 w-full rounded-lg" alt="Image Preview">
+        </div>
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700">Status</label>
           <div class="mt-2 flex space-x-4">
@@ -302,7 +310,6 @@
     // Simulate Login State (Assuming user is logged in)
     const isLoggedIn = true;
     if (isLoggedIn) {
-      document.getElementById('login-btn').classList.add('hidden');
       document.getElementById('profile-link').classList.remove('hidden');
     }
 
@@ -312,6 +319,8 @@
     const modal = document.getElementById('post-modal');
     const postForm = document.getElementById('post-item-form');
     const postError = document.getElementById('post-error');
+    const imageInput = document.getElementById('item-image');
+    const imagePreview = document.getElementById('image-preview');
 
     openModalBtn.addEventListener('click', () => {
       modal.classList.remove('hidden');
@@ -321,6 +330,24 @@
       modal.classList.add('hidden');
       postForm.reset();
       postError.classList.add('hidden');
+      imagePreview.style.display = 'none';
+      imagePreview.src = '';
+    });
+
+    // Image Preview
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
+      }
     });
 
     postForm.addEventListener('submit', (e) => {
@@ -329,6 +356,7 @@
       const description = document.getElementById('item-description').value;
       const category = document.getElementById('item-category').value;
       const status = document.querySelector('input[name="item-status"]:checked')?.value;
+      const image = imageInput.files[0] ? URL.createObjectURL(imageInput.files[0]) : null;
       if (!name || !description || !category || !status) {
         postError.textContent = 'Please fill in all required fields.';
         postError.classList.remove('hidden');
@@ -341,19 +369,22 @@
           description,
           category,
           status: 'Pending',
-          posted: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+          posted: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+          image
         };
         items.push(newItem);
         filterItems();
         modal.classList.add('hidden');
         postForm.reset();
+        imagePreview.style.display = 'none';
+        imagePreview.src = '';
       }
     });
 
     // Sample Data for Items
     const items = [
-      { id: 1, name: 'Blue Backpack', description: 'Found near library, contains books', category: 'Accessories', status: 'Pending', posted: 'Sep 6, 2025' },
-      { id: 2, name: 'Lost Keys', description: 'Car keys with red keychain', category: 'Accessories', status: 'Approved', posted: 'Sep 5, 2025' },
+      { id: 1, name: 'Blue Backpack', description: 'Found near library, contains books', category: 'Accessories', status: 'Pending', posted: 'Sep 6, 2025', image: null },
+      { id: 2, name: 'Lost Keys', description: 'Car keys with red keychain', category: 'Accessories', status: 'Approved', posted: 'Sep 5, 2025', image: null },
     ];
 
     // DOM Elements for Filtering
@@ -368,7 +399,7 @@
         const card = document.createElement('div');
         card.className = 'item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 fade-in';
         card.innerHTML = `
-          <div class="h-40 bg-gray-200 rounded-lg mb-4"></div>
+          <div class="h-40 rounded-lg mb-4 ${item.image ? '' : 'bg-gray-200'}" style="${item.image ? `background-image: url(${item.image}); background-size: cover; background-position: center;` : ''}"></div>
           <h3 class="text-lg font-semibold text-gray-800">${item.name}</h3>
           <p class="text-sm text-gray-600 mb-2">${item.description}</p>
           <p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> ${item.category}</p>
