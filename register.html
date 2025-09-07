@@ -5,12 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lost & Found - Sign Up</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-
-  <!-- Signup Section -->
   <section class="py-16 px-4">
-    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-md fade-in">
       <h1 class="text-3xl font-extrabold text-blue-900 mb-6 text-center">Sign Up</h1>
       <p class="text-base text-gray-600 mb-8 text-center">Create an account to start posting and claiming lost or found items.</p>
       
@@ -41,26 +51,20 @@
       <p class="mt-6 text-center text-sm text-gray-600">
         Already have an account? <a href="login.html" class="text-teal-500 hover:text-teal-600">Login</a>
       </p>
-      <p id="error-message" class="mt-4 text-center text-sm hidden"></p>
+      <p id="error-message" class="mt-4 text-center text-sm text-red-500 hidden"></p>
       <p id="success-message" class="mt-4 text-center text-sm text-green-600 hidden"></p>
     </div>
   </section>
 
-  <!-- Load Supabase using ES modules -->
   <script type="module">
-    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2'
-    
-    // Initialize Supabase
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+
     const SUPABASE_URL = "https://wooxhjsckxfajsupiuge.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3hoanNja3hmYWpzdXBpdWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNzk0ODcsImV4cCI6MjA3Mjc1NTQ4N30.Lo2DeJmSeD0Wm0yVjpXuuDEy9Y_d7bTy3VOK-F8TxzY";
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    console.log('Supabase initialized:', supabase);
 
-    // Register Function
     async function register(email, password, name, whatsapp) {
       console.log('Attempting to register user:', email);
-      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -72,49 +76,16 @@
           }
         }
       });
-      
       if (error) {
         console.error('Registration error:', error);
-        throw new Error(error.message);
+        throw new Error(error.message.includes('User already registered') 
+          ? 'This email is already registered. Please log in or use a different email.' 
+          : error.message);
       }
-      
       console.log('Registration successful:', data);
-      
-      // If user is created, save additional profile data
-      if (data.user) {
-        try {
-          await saveProfile(data.user.id, name, whatsapp);
-        } catch (profileError) {
-          console.error('Profile save error:', profileError);
-          // Don't throw here as the user was created successfully
-        }
-      }
-      
       return data;
     }
 
-    // Save Profile Function
-    async function saveProfile(userId, name, whatsapp) {
-      console.log('Saving profile for user:', userId);
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert({ 
-          id: userId, 
-          full_name: name, 
-          whatsapp: whatsapp 
-        });
-        
-      if (error) {
-        console.error('Profile save error:', error);
-        throw new Error(error.message);
-      }
-      
-      console.log('Profile saved:', data);
-      return data;
-    }
-
-    // Form handling
     const form = document.getElementById('signup-form');
     const errorMessage = document.getElementById('error-message');
     const successMessage = document.getElementById('success-message');
@@ -122,19 +93,15 @@
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      // Hide previous messages
       errorMessage.classList.add('hidden');
       successMessage.classList.add('hidden');
-      
-      // Get form data
+
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm-password').value;
 
-      // Validation
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       const phoneRegex = /^\+\d{9,15}$/;
       const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/;
@@ -143,7 +110,7 @@
       if (!name) errors.push('Full name is required.');
       if (!emailRegex.test(email)) errors.push('Please enter a valid email address.');
       if (!phoneRegex.test(phone)) errors.push('Please enter a valid phone number (e.g., +1234567890).');
-      if (!passwordRegex.test(password)) errors.push('Password must be at least 6 characters with uppercase, lowercase, and a number.');
+      if (!passwordRegex.test(password)) errors.push('Password must be at least 6 characters long and include at least one uppercase letter, one lowercase letter, and one number.');
       if (password !== confirmPassword) errors.push('Passwords do not match.');
 
       if (errors.length > 0) {
@@ -152,24 +119,17 @@
         return;
       }
 
-      // Submit
       submitBtn.disabled = true;
       submitBtn.textContent = 'Creating...';
 
       try {
         await register(email, password, name, phone);
-        
         successMessage.textContent = 'Account created successfully! Please check your email to verify your account.';
         successMessage.classList.remove('hidden');
-        
-        // Reset form
         form.reset();
-        
-        // Redirect after delay
         setTimeout(() => {
           window.location.href = 'login.html';
         }, 3000);
-        
       } catch (err) {
         console.error('Signup error:', err);
         errorMessage.textContent = err.message || 'Signup failed. Please try again.';
