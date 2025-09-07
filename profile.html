@@ -83,6 +83,14 @@
         padding: 1rem 0;
         font-size: 0.9rem;
       }
+      #mobile-menu {
+        background-color: rgb(30, 58, 138);
+        transition: all 0.3s ease;
+      }
+      
+      #mobile-menu.show {
+        display: block;
+      }
     }
     #image-preview {
       max-height: 200px;
@@ -121,20 +129,32 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
   <!-- Navbar -->
-  <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-between items-center">
-      <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
-      <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-      <div class="nav-menu hidden sm:flex items-center space-x-6">
-        <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
-        <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
-        <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
-        <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
-        <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm">Logout</button>
+  <nav id="navbar" class="bg-blue-900 text-white p-4 shadow-lg navbar relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="flex justify-between items-center">
+        <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
+        <button id="menu-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+        <div class="nav-menu hidden sm:flex items-center space-x-6">
+          <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+          <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+          <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+          <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
+          <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm">Logout</button>
+        </div>
+      </div>
+      <!-- Mobile menu, shows/hides based on menu state -->
+      <div class="sm:hidden">
+        <div id="mobile-menu" class="hidden px-2 pt-2 pb-3 space-y-1">
+          <a href="index.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Home</a>
+          <a href="lost-items.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Lost Items</a>
+          <a href="contact.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Contact Us</a>
+          <a href="profile.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Profile</a>
+          <button id="mobile-logout-btn" class="w-full text-left px-3 py-2 text-white hover:bg-red-600 rounded-md">Logout</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -611,9 +631,9 @@
             <div class="space-y-1 text-xs text-gray-500">
               ${item.category ? `<p><strong>Category:</strong> ${item.category}</p>` : ''}
               ${item.location ? `<p><strong>Location:</strong> ${item.location}</p>` : ''}
-              ${item.date_lost ? `<p><strong>Date:</strong> ${new Date(item.date_lost).toLocaleDateString()}</p>` : ''}
+              ${item.date_lost ? `<p><strong>Date:</strong> ${formatDate(item.date_lost)}</p>` : ''}
               ${item.contact_info ? `<p><strong>Contact:</strong> ${item.contact_info}</p>` : ''}
-              <p><strong>Posted:</strong> ${new Date(item.created_at).toLocaleDateString()}</p>
+              <p><strong>Posted:</strong> ${formatDate(item.created_at)}</p>
             </div>
           </div>
           <div class="flex space-x-2">
@@ -670,7 +690,7 @@
             <div class="space-y-1 text-xs text-gray-500">
               <p><strong>Claimant:</strong> ${claim.users.full_name}</p>
               <p><strong>Email:</strong> ${claim.users.email}</p>
-              <p><strong>Claimed:</strong> ${new Date(claim.created_at).toLocaleDateString()}</p>
+              <p><strong>Claimed:</strong> ${formatDate(claim.created_at)}</p>
             </div>
           </div>
           ${claim.status === 'pending' ? `
@@ -925,6 +945,19 @@
         .subscribe();
     }
 
+    // Utility Functions
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      const day = date.getDate();
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    }
+
     // Event Listeners
     profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -987,10 +1020,19 @@
     searchInput.addEventListener('input', filterItems);
 
     menuToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('active');
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.remove('hidden');
+        mobileMenu.classList.add('show');
+      } else {
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('show');
+      }
     });
 
     logoutBtn.addEventListener('click', logout);
+
+    document.getElementById('mobile-logout-btn').addEventListener('click', logout);
 
     imageInput.addEventListener('change', () => {
       const file = imageInput.files[0];

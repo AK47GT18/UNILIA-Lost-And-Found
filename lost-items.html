@@ -407,9 +407,10 @@
           <p class="text-sm text-gray-600 mb-2 line-clamp-2">${item.description || 'No description provided'}</p>
           ${item.category ? `<p class="text-sm text-gray-600 mb-2"><strong>Category:</strong> ${item.category}</p>` : ''}
           ${item.location ? `<p class="text-sm text-gray-600 mb-2"><strong>Location:</strong> ${item.location}</p>` : ''}
-          ${item.date_lost ? `<p class="text-sm text-gray-600 mb-2"><strong>Date ${item.status === 'lost' ? 'Lost' : 'Found'}:</strong> ${new Date(item.date_lost).toLocaleDateString()}</p>` : ''}
+          ${item.date_lost ? `
+            <p class="text-sm text-gray-600 mb-2"><strong>Date ${item.status === 'lost' ? 'Lost' : 'Found'}:</strong> ${formatDate(item.date_lost)}</p>` : ''}
           ${item.contact_info ? `<p class="text-sm text-gray-600 mb-2"><strong>Contact:</strong> ${item.contact_info}</p>` : ''}
-          <p class="text-sm text-gray-500 mb-4"><strong>Posted:</strong> ${new Date(item.created_at).toLocaleDateString()}</p>
+          <p class="text-sm text-gray-500 mb-4"><strong>Posted:</strong> ${formatDate(item.created_at)}</p>
           ${item.users?.whatsapp && item.status !== 'claimed' ? `
             <button onclick="handleContact('${whatsappUrl}')" class="w-full px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2">
               ${buttonText}
@@ -544,6 +545,18 @@
         el.style.animationDelay = `${index * 0.1 + 0.2}s`;
       });
     });
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const months = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+      const day = date.getDate();
+      const month = months[date.getMonth()];
+      const year = date.getFullYear();
+      return `${day} ${month} ${year}`;
+    }
   </script>
 </body>
 </html>
