@@ -57,25 +57,6 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
-    @media (max-width: 640px) {
-      .nav-menu {
-        display: none;
-      }
-      .nav-menu.active {
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        background-color: rgba(30, 58, 138, 0.95);
-        padding: 1rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      .nav-menu a, .nav-menu button {
-        padding: 0.75rem 0;
-      }
-    }
     .loader {
       display: inline-block;
       width: 40px;
@@ -89,52 +70,66 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .error-message {
-      background: #fee2e2;
-      color: #dc2626;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin: 1rem 0;
-    }
-    .success-message {
-      background: #d1fae5;
-      color: #065f46;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      margin: 1rem 0;
+    @media (max-width: 640px) {
+      .nav-menu {
+        display: none;
+      }
+      .nav-menu.active {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: rgba(30, 58, 138, 0.95);
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .nav-menu a, .nav-menu button {
+        padding: 1rem 0;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-  <!-- Loading Screen -->
-  <div id="loading-screen" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="text-center">
-      <div class="loader mb-4"></div>
-      <p class="text-white text-lg font-medium">Loading items...</p>
+  <!-- Replace the existing navbar with this updated version -->
+  <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-between items-center">
+      <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
+      <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <div class="nav-menu hidden sm:flex items-center space-x-6">
+        <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+        <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+        <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+        <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300 hidden" id="profile-link">Profile</a>
+        <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm hidden">Logout</button>
+        <a href="login.html" id="login-btn" class="px-3 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 text-sm">Login</a>
+        <a href="register.html" id="sign-up-btn" class="px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300 text-sm">Sign Up</a>
+      </div>
+    </div>
+  </nav>
+  <!-- Error Modal -->
+  <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full fade-in">
+      <h3 class="text-lg font-semibold text-red-500 mb-4">Error</h3>
+      <p id="error-modal-message" class="text-sm text-gray-600"></p>
+      <button id="error-modal-close" class="mt-6 w-full px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300">Close</button>
     </div>
   </div>
 
-  <!-- Navbar -->
-  <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
-    <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
-    <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </button>
-    <div class="nav-menu flex items-center space-x-6 sm:flex">
-      <a href="#" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
-      <a href="#" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
-      <a href="#" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
-      <a href="#" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300 hidden" id="profile-link">Profile</a>
-      <button id="logout-btn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 hidden">Logout</button>
-      <button id="login-btn" class="px-4 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300">Login</button>
-      <button class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300">Sign Up</button>
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full fade-in">
+      <h3 class="text-lg font-semibold text-green-600 mb-4">Success</h3>
+      <p id="success-modal-message" class="text-sm text-gray-600"></p>
+      <button id="success-modal-close" class="mt-6 w-full px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300">Close</button>
     </div>
-  </nav>
-
-  <!-- Error/Success Messages -->
-  <div id="messages" class="max-w-6xl mx-auto px-4 pt-4"></div>
+  </div>
 
   <!-- Lost Items Section -->
   <section class="py-16 px-4">
@@ -201,9 +196,9 @@
         <div>
           <h3 class="text-lg font-bold mb-4">Quick Links</h3>
           <ul class="space-y-2 text-sm">
-            <li><a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Home</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Lost Items</a></li>
-            <li><a href="#" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Contact Us</a></li>
+            <li><a href="index.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Home</a></li>
+            <li><a href="lost-items.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Lost Items</a></li>
+            <li><a href="contact.html" class="text-gray-300 hover:text-teal-300 transition-colors duration-300">Contact Us</a></li>
           </ul>
         </div>
         <div>
@@ -224,93 +219,23 @@
     </div>
   </footer>
 
-  <script>
-    // Mock data for demonstration since Supabase is not accessible in this environment
-    const mockItems = [
-      {
-        id: 1,
-        title: "iPhone 14 Pro",
-        description: "Black iPhone 14 Pro found in the library",
-        location: "Central Library",
-        status: "found",
-        category: "Electronics",
-        image_url: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400",
-        created_at: "2025-01-15T10:00:00.000Z",
-        date_lost: "2025-01-14",
-        contact_info: "Contact security desk",
-        users: { whatsapp: "1234567890" }
-      },
-      {
-        id: 2,
-        title: "Blue Backpack",
-        description: "Lost blue Jansport backpack with textbooks",
-        location: "Student Center",
-        status: "lost",
-        category: "Accessories",
-        image_url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
-        created_at: "2025-01-14T15:30:00.000Z",
-        date_lost: "2025-01-13",
-        contact_info: "Email: student@university.edu",
-        users: { whatsapp: "0987654321" }
-      },
-      {
-        id: 3,
-        title: "Calculator",
-        description: "TI-84 Plus calculator found in Math building",
-        location: "Mathematics Building Room 201",
-        status: "found",
-        category: "Electronics",
-        created_at: "2025-01-13T09:15:00.000Z",
-        date_lost: "2025-01-12",
-        contact_info: "Contact math department",
-        users: { whatsapp: "1122334455" }
-      },
-      {
-        id: 4,
-        title: "Biology Textbook",
-        description: "Campbell Biology 12th edition",
-        location: "Science Library",
-        status: "lost",
-        category: "Books",
-        created_at: "2025-01-12T14:20:00.000Z",
-        date_lost: "2025-01-11",
-        contact_info: "Call 555-0123",
-        users: { whatsapp: "5551234567" }
-      },
-      {
-        id: 5,
-        title: "Red Winter Jacket",
-        description: "North Face red winter jacket, size M",
-        location: "Gymnasium",
-        status: "found",
-        category: "Clothing",
-        image_url: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400",
-        created_at: "2025-01-11T16:45:00.000Z",
-        date_lost: "2025-01-10",
-        contact_info: "Check at gym front desk",
-        users: { whatsapp: "9876543210" }
-      },
-      {
-        id: 6,
-        title: "Student ID Card",
-        description: "Student ID for John Smith",
-        location: "Dining Hall",
-        status: "claimed",
-        category: "Documents",
-        created_at: "2025-01-10T12:00:00.000Z",
-        date_lost: "2025-01-09",
-        contact_info: "Returned to student services",
-        users: { whatsapp: "1357924680" }
-      }
-    ];
+  <!-- JavaScript for Supabase, Navbar, Filter, Search, and Pagination -->
+  <script type="module">
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = "https://wooxhjsckxfajsupiuge.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3hoanNja3hmYWpzdXBpdWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNzk0ODcsImV4cCI6MjA3Mjc1NTQ4N30.Lo2DeJmSeD0Wm0yVjpXuuDEy9Y_d7bTy3VOK-F8TxzY";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      db: { schema: 'public' },
+      fetch: (url, options) => fetch(`${url}?t=${Date.now()}`, options)
+    });
 
     let currentUser = null;
-    let items = mockItems;
+    let items = [];
     const itemsPerPage = 9;
     let currentPage = 1;
 
     // DOM Elements
-    const loadingScreen = document.getElementById('loading-screen');
     const itemGrid = document.getElementById('item-grid');
     const prevPageBtn = document.getElementById('prev-page');
     const nextPageBtn = document.getElementById('next-page');
@@ -323,68 +248,102 @@
     const loginBtn = document.getElementById('login-btn');
     const profileLink = document.getElementById('profile-link');
     const logoutBtn = document.getElementById('logout-btn');
-    const messagesContainer = document.getElementById('messages');
+    const errorModal = document.getElementById('error-modal');
+    const successModal = document.getElementById('success-modal');
+    const errorModalMessage = document.getElementById('error-modal-message');
+    const successModalMessage = document.getElementById('success-modal-message');
+    const errorModalClose = document.getElementById('error-modal-close');
+    const successModalClose = document.getElementById('success-modal-close');
 
-    // Utility function to show messages
-    function showMessage(message, type = 'error') {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = `${type}-message`;
-      messageDiv.textContent = message;
-      messagesContainer.appendChild(messageDiv);
-      
-      setTimeout(() => {
-        messageDiv.remove();
-      }, 5000);
+    // Modal Functions
+    function showModal(modal, message, isSuccess = false) {
+      const messageElement = isSuccess ? successModalMessage : errorModalMessage;
+      messageElement.textContent = message;
+      modal.classList.remove('hidden');
+      if (isSuccess) {
+        setTimeout(() => {
+          modal.classList.add('hidden');
+        }, 5000);
+      }
     }
 
+    errorModalClose.addEventListener('click', () => {
+      errorModal.classList.add('hidden');
+    });
+
+    successModalClose.addEventListener('click', () => {
+      successModal.classList.add('hidden');
+    });
+
     // Initialize
-    function initialize() {
+    async function initialize() {
       try {
-        // Simulate authentication check
-        currentUser = localStorage.getItem('mockUser');
-        if (currentUser) {
-          loginBtn.classList.add('hidden');
-          profileLink.classList.remove('hidden');
-          logoutBtn.classList.remove('hidden');
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Auth error:', error.message);
+        } else {
+          currentUser = user;
+          if (currentUser) {
+            loginBtn.classList.add('hidden');
+            document.querySelector('[href="register.html"]').classList.add('hidden'); // Add this line
+            profileLink.classList.remove('hidden');
+            logoutBtn.classList.remove('hidden');
+          }
         }
-        
-        loadItems();
+        await loadItems();
       } catch (error) {
         console.error('Initialization error:', error);
-        showMessage('Error initializing application. Please refresh the page.');
-      } finally {
-        setTimeout(() => {
-          loadingScreen.classList.add('hidden');
-        }, 1000);
+        showModal(errorModal, 'Error initializing application. Please try again.');
       }
     }
 
     // Load Items
-    function loadItems() {
+    async function loadItems() {
       try {
-        // Filter out claimed items older than 24 hours
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-        items = mockItems.filter(item => {
-          if (item.status === 'claimed') {
-            const itemDate = new Date(item.created_at);
-            return itemDate >= oneDayAgo;
-          }
-          return true;
-        });
-        
-        console.log('Loaded items:', items);
+        itemGrid.innerHTML = `
+          <div class="text-center py-8 col-span-full">
+            <div class="loader mb-4 mx-auto"></div>
+            <p class="text-gray-600">Loading items...</p>
+          </div>
+        `;
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data, error } = await supabase
+          .from('lost_items')
+          .select(`
+            id, title, description, location, status, image_url, created_at, category, contact_info, date_lost,
+            users (whatsapp)
+          `)
+          .neq('status', 'claimed')
+          .or(`status.eq.claimed,created_at.gte.${oneDayAgo}`)
+          .order('created_at', { ascending: false });
+        if (error) {
+          throw new Error(`Failed to fetch items: ${error.message} (code: ${error.code})`);
+        }
+        items = data || [];
+        console.log('Fetched items:', items);
         filterItems();
+        subscribeToItems();
       } catch (error) {
         console.error('Error loading items:', error);
-        showMessage('Error loading items. Please try again.');
-        itemGrid.innerHTML = '<div class="col-span-full text-center text-red-500">Error loading items. Please try again.</div>';
+        itemGrid.innerHTML = '';
+        showModal(errorModal, `Error loading items: ${error.message}`);
       }
+    }
+
+    // Real-time Subscription
+    function subscribeToItems() {
+      supabase
+        .channel('public:lost_items')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'lost_items' }, () => {
+          console.log('Items table changed, reloading...');
+          loadItems();
+        })
+        .subscribe();
     }
 
     // Render Items
     function renderItems(pageItems) {
       itemGrid.innerHTML = '';
-      
       if (pageItems.length === 0) {
         itemGrid.innerHTML = `
           <div class="col-span-full text-center py-8">
@@ -397,20 +356,16 @@
         `;
         return;
       }
-
       pageItems.forEach(item => {
         const card = document.createElement('div');
         card.className = 'item-card bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 fade-in';
-        
         const statusBadge = {
           'lost': 'bg-red-100 text-red-800',
           'found': 'bg-green-100 text-green-800',
           'claimed': 'bg-blue-100 text-blue-800'
         };
-        
         const buttonText = item.status === 'found' ? 'Claim Item' : 'Contact Owner';
         const whatsappUrl = `https://wa.me/${item.users?.whatsapp || ''}?text=${encodeURIComponent(`I'm interested in ${item.status === 'found' ? 'claiming' : 'discussing'} your item: ${item.title}`)}`;
-        
         card.innerHTML = `
           ${item.image_url ? 
             `<img src="${item.image_url}" class="w-full h-40 object-cover rounded-lg mb-4" alt="${item.title}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -447,48 +402,99 @@
             <div class="text-center text-sm text-gray-500">Contact information not available</div>
           `}
         `;
-        
         itemGrid.appendChild(card);
       });
     }
 
-    // Handle contact button click
-    function handleContact(url) {
+    // Handle Contact Button
+    window.handleContact = function(url) {
       if (!currentUser) {
-        showMessage('Please login to contact item owners', 'error');
-        loginBtn.click();
+        showModal(errorModal, 'Please login to contact item owners');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 2000);
         return;
       }
       window.open(url, '_blank');
-    }
-
-    // Make handleContact globally available
-    window.handleContact = handleContact;
+    };
 
     // Filter and Search Logic
     function filterItems() {
-      try {
-        const category = categoryFilter.value;
-        const status = statusFilter.value;
-        const search = searchInput.value.toLowerCase().trim();
-        
-        const filteredItems = items.filter(item => {
-          const matchesCategory = category === 'all' || item.category === category;
-          const matchesStatus = status === 'all' || item.status === status;
-          const matchesSearch = item.title.toLowerCase().includes(search) || (item.description && item.description.toLowerCase().includes(search));
-          return matchesCategory && matchesStatus && matchesSearch;
-        });
-        
-        renderItems(filteredItems);
-      } catch (error) {
-        console.error('Error filtering items:', error);
-      }
+      const category = categoryFilter.value;
+      const status = statusFilter.value;
+      const search = searchInput.value.toLowerCase().trim();
+      const filteredItems = items.filter(item => {
+        const matchesCategory = category === 'all' || item.category === category;
+        const matchesStatus = status === 'all' || item.status === status;
+        const matchesSearch = item.title.toLowerCase().includes(search) || (item.description || '').toLowerCase().includes(search);
+        return matchesCategory && matchesStatus && matchesSearch;
+      });
+      currentPage = 1;
+      updatePagination(filteredItems);
     }
 
-    // Event listeners
+    // Update Pagination
+    function updatePagination(filteredItems) {
+      const totalItems = filteredItems.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage - 1;
+      const pageItems = filteredItems.slice(start, end + 1);
+      pageInfo.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+      renderItems(pageItems);
+    }
+
+    // Sticky Navbar
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('navbar-sticky');
+      } else {
+        navbar.classList.remove('navbar-sticky');
+      }
+    });
+
+    // Mobile Menu Toggle
+    menuToggle.addEventListener('click', () => {
+      navMenu.classList.toggle('active');
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = 'login.html';
+    });
+
+    // Event Listeners
     categoryFilter.addEventListener('change', filterItems);
     statusFilter.addEventListener('change', filterItems);
     searchInput.addEventListener('input', filterItems);
-  </script> 
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        filterItems();
+      }
+    });
+    nextPageBtn.addEventListener('click', () => {
+      const totalPages = Math.ceil(items.filter(item => {
+        const category = categoryFilter.value;
+        const status = statusFilter.value;
+        const search = searchInput.value.toLowerCase();
+        const matchesCategory = category === 'all' || item.category === category;
+        const matchesStatus = status === 'all' || item.status === status;
+        const matchesSearch = item.title.toLowerCase().includes(search) || (item.description || '').toLowerCase().includes(search);
+        return matchesCategory && matchesStatus && matchesSearch;
+      }).length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        filterItems();
+      }
+    });
+
+    // Initialize
+    initialize();
+  </script>
 </body>
 </html>

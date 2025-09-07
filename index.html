@@ -53,6 +53,13 @@
       from { transform: translateY(20px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
+    .modal {
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: scale(0.95);
+    }
+    .modal.show {
+      transform: scale(1);
+    }
     @media (max-width: 640px) {
       .nav-menu {
         display: none;
@@ -65,34 +72,69 @@
         left: 0;
         width: 100%;
         background-color: rgba(30, 58, 138, 0.95);
-        padding: 1rem;
+        padding: 1.5rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
-      .nav-menu a {
-        padding: 0.75rem 0;
+      .nav-menu a, .nav-menu button {
+        padding: 1rem 0;
+        font-size: 0.9rem;
       }
+    }
+    .loader {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(45, 212, 191, 0.2);
+      border-top: 4px solid #2DD4BF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
-<body class="bg-white text-gray-800">
-
+<body class="bg-gray-50 text-gray-800">
   <!-- Navbar -->
+  <!-- Replace the existing navbar with this updated version -->
   <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
-    <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
-    <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </button>
-    <div class="nav-menu flex items-center space-x-6 sm:flex">
-      <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
-      <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
-      <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
-      <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300 hidden" id="profile-link">Profile</a>
-      <a href="login.html" class="px-4 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300" id="login-btn">Login</a>
-      <a href="register.html" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300">Sign Up</a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-between items-center">
+      <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
+      <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+      <div class="nav-menu hidden sm:flex items-center space-x-6">
+        <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+        <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+        <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+        <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300 hidden" id="profile-link">Profile</a>
+        <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm hidden">Logout</button>
+        <a href="login.html" id="login-btn" class="px-3 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 text-sm">Login</a>
+        <a href="register.html" id="sign-up-btn" class="px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300 text-sm">Sign Up</a>
+      </div>
     </div>
   </nav>
+
+  <!-- Error Modal -->
+  <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full fade-in">
+      <h3 class="text-lg font-semibold text-red-500 mb-4">Error</h3>
+      <p id="error-modal-message" class="text-sm text-gray-600"></p>
+      <button id="error-modal-close" class="mt-6 w-full px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300">Close</button>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white p-6 rounded-xl shadow-lg max-w-sm w-full fade-in">
+      <h3 class="text-lg font-semibold text-green-600 mb-4">Success</h3>
+      <p id="success-modal-message" class="text-sm text-gray-600"></p>
+      <button id="success-modal-close" class="mt-6 w-full px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-all duration-300">Close</button>
+    </div>
+  </div>
 
   <!-- Hero Section with Slider -->
   <section class="relative text-center py-16 sm:py-24 bg-gray-50 overflow-hidden">
@@ -207,8 +249,111 @@
     </div>
   </footer>
 
-  <!-- JavaScript for Navbar, Slider, and Animations -->
-  <script>
+  <!-- JavaScript -->
+  <script type="module">
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js@2';
+
+    const SUPABASE_URL = "https://wooxhjsckxfajsupiuge.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indvb3hoanNja3hmYWpzdXBpdWdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxNzk0ODcsImV4cCI6MjA3Mjc1NTQ4N30.Lo2DeJmSeD0Wm0yVjpXuuDEy9Y_d7bTy3VOK-F8TxzY";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+      db: { schema: 'public' },
+      fetch: (url, options) => fetch(`${url}?t=${Date.now()}`, options)
+    });
+
+    // DOM Elements
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu = document.querySelector('.nav-menu');
+    const loginBtn = document.getElementById('login-btn');
+    const signUpBtn = document.getElementById('sign-up-btn');
+    const profileLink = document.getElementById('profile-link');
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutText = document.getElementById('logout-text');
+    const logoutLoader = document.getElementById('logout-loader');
+    const errorModal = document.getElementById('error-modal');
+    const successModal = document.getElementById('success-modal');
+    const errorModalMessage = document.getElementById('error-modal-message');
+    const successModalMessage = document.getElementById('success-modal-message');
+    const errorModalClose = document.getElementById('error-modal-close');
+    const successModalClose = document.getElementById('success-modal-close');
+
+    let currentUser = null;
+
+    // Modal Functions
+    function showModal(modal, message, isSuccess = false) {
+      const messageElement = isSuccess ? successModalMessage : errorModalMessage;
+      messageElement.textContent = message;
+      modal.classList.remove('hidden');
+      modal.classList.add('show');
+      if (isSuccess) {
+        setTimeout(() => {
+          modal.classList.remove('show');
+          modal.classList.add('hidden');
+        }, 5000);
+      }
+    }
+
+    errorModalClose.addEventListener('click', () => {
+      errorModal.classList.remove('show');
+      errorModal.classList.add('hidden');
+    });
+
+    successModalClose.addEventListener('click', () => {
+      successModal.classList.remove('show');
+      successModal.classList.add('hidden');
+    });
+
+    // Initialize Authentication
+    async function initAuth() {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error('Auth error:', error.message);
+          throw new Error('Failed to check authentication status.');
+        }
+        currentUser = user;
+        if (user) {
+          loginBtn.classList.add('hidden');
+          signUpBtn.classList.add('hidden');
+          profileLink.classList.remove('hidden');
+          logoutBtn.classList.remove('hidden');
+        } else {
+          loginBtn.classList.remove('hidden');
+          signUpBtn.classList.remove('hidden');
+          profileLink.classList.add('hidden');
+          logoutBtn.classList.add('hidden');
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        showModal(errorModal, 'Error checking authentication status.');
+      }
+    }
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+      logoutBtn.disabled = true;
+      logoutText.classList.add('hidden');
+      logoutLoader.classList.remove('hidden');
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+          throw new Error(`Logout error: ${error.message}`);
+        }
+        currentUser = null;
+        loginBtn.classList.remove('hidden');
+        signUpBtn.classList.remove('hidden');
+        profileLink.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        showModal(successModal, 'You have been logged out successfully.');
+      } catch (error) {
+        console.error('Error logging out:', error);
+        showModal(errorModal, 'Error logging out. Please try again.');
+      } finally {
+        logoutBtn.disabled = false;
+        logoutText.classList.remove('hidden');
+        logoutLoader.classList.add('hidden');
+      }
+    });
+
     // Sticky Navbar
     window.addEventListener('scroll', () => {
       const navbar = document.getElementById('navbar');
@@ -220,18 +365,9 @@
     });
 
     // Mobile Menu Toggle
-    const menuToggle = document.getElementById('menu-toggle');
-    const navMenu = document.querySelector('.nav-menu');
     menuToggle.addEventListener('click', () => {
       navMenu.classList.toggle('active');
     });
-
-    // Simulate Login State (Replace with actual authentication logic)
-    const isLoggedIn = false; // This should be dynamically set based on user authentication
-    if (isLoggedIn) {
-      document.getElementById('login-btn').classList.add('hidden');
-      document.getElementById('profile-link').classList.remove('hidden');
-    }
 
     // Slider Functionality
     const slider = document.querySelector('.slider');
@@ -260,9 +396,19 @@
       showSlide(currentSlide);
     }, 5000);
 
-    // Initial slide setup
-    showSlide(currentSlide);
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      initAuth();
+      showSlide(currentSlide);
+      const fadeElements = document.querySelectorAll('.fade-in');
+      fadeElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1}s`;
+      });
+      const slideElements = document.querySelectorAll('.slide-in');
+      slideElements.forEach((el, index) => {
+        el.style.animationDelay = `${index * 0.1 + 0.2}s`;
+      });
+    });
   </script>
-
 </body>
 </html>
