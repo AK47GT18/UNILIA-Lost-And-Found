@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ak47gt18.github.io/UNILIA-Lost-And-Found/sitemap.xml
