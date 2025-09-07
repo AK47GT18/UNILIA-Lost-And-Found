@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>User-agent: *
-Allow: /
-Sitemap: https://ak47gt18.github.io/UNILIA-Lost-And-Found/sitemap.xmlgoogle-site-verification: googleb368632be9912253.html</loc>
+    <loc>https://ak47gt18.github.io/UNILIA-Lost-And-Found/</loc>
     <priority>1.0</priority>
     
   </url>
