@@ -58,7 +58,7 @@
     .modal.show {
       transform: scale(1);
     }
-    @media (max-width: 640px) {
+      @media (max-width: 640px) {
       .nav-menu {
         display: none;
       }
@@ -70,12 +70,24 @@
         left: 0;
         width: 100%;
         background-color: rgba(30, 58, 138, 0.95);
-        padding: 1.5rem;
+        padding: 1rem;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .nav-menu a, .nav-menu button {
-        padding: 1rem 0;
-        font-size: 0.9rem;
+        padding: 0.75rem 0;
+        font-size: 0.875rem;
+      }
+      #mobile-menu {
+        background-color: rgb(30, 58, 138);
+        transition: all 0.3s ease;
+      }
+      #mobile-menu.show {
+        display: block;
+      }
+      .modal-content {
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 1.5rem;
       }
     }
     .loader {
@@ -98,22 +110,31 @@
 </head>
 <body class="bg-gray-50 text-gray-800">
   <!-- Navbar -->
-  <nav id="navbar" class="bg-blue-900 text-white p-4 flex justify-between items-center shadow-lg navbar">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex justify-between items-center">
-      <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
-      <button id="menu-toggle" class="sm:hidden text-white focus:outline-none">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-        </svg>
-      </button>
-      <div class="nav-menu hidden sm:flex items-center space-x-6">
-        <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
-        <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
-        <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
-        <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300 hidden" id="profile-link">Profile</a>
-        <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm hidden">Logout</button>
-        <a href="login.html" id="login-btn" class="px-3 py-2 bg-white text-blue-900 rounded-lg hover:bg-gray-100 transition-colors duration-300 text-sm">Login</a>
-        <a href="register.html" id="sign-up-btn" class="px-3 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors duration-300 text-sm">Sign Up</a>
+   <nav id="navbar" class="bg-blue-900 text-white p-4 shadow-lg navbar relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div class="flex justify-between items-center">
+        <div class="text-2xl font-bold tracking-tight">Lost & Found</div>
+        <button id="menu-toggle" class="sm:hidden text-white focus:outline-none" aria-label="Menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+        <div class="nav-menu hidden sm:flex items-center space-x-6">
+          <a href="index.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Home</a>
+          <a href="lost-items.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Lost Items</a>
+          <a href="contact.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300">Contact Us</a>
+          <a href="profile.html" class="nav-link px-3 py-2 text-white hover:text-teal-300 transition-colors duration-300" id="profile-link">Profile</a>
+          <button id="logout-btn" class="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-300 text-sm">Logout</button>
+        </div>
+      </div>
+      <div class="sm:hidden">
+        <div id="mobile-menu" class="hidden px-2 pt-2 pb-3 space-y-1">
+          <a href="index.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Home</a>
+          <a href="lost-items.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Lost Items</a>
+          <a href="contact.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Contact Us</a>
+          <a href="profile.html" class="block px-3 py-2 text-white hover:bg-blue-800 rounded-md">Profile</a>
+          <button id="mobile-logout-btn" class="w-full text-left px-3 py-2 text-white hover:bg-red-600 rounded-md">Logout</button>
+        </div>
       </div>
     </div>
   </nav>
@@ -370,6 +391,7 @@
     const submitText = document.getElementById('submit-text');
     const submitLoader = document.getElementById('submit-loader');
     const menuToggle = document.getElementById('menu-toggle');
+   const mobileMenu = document.getElementById('mobile-menu');
     const navMenu = document.querySelector('.nav-menu');
     const loginBtn = document.getElementById('login-btn');
     const signUpBtn = document.getElementById('sign-up-btn');
@@ -421,17 +443,17 @@
         }
         currentUser = user;
         if (user) {
-          loginBtn.classList.add('hidden');
-          signUpBtn.classList.add('hidden');
-          profileLink.classList.remove('hidden');
-          logoutBtn.classList.remove('hidden');
-          loadDraft();
-        } else {
-          loginBtn.classList.remove('hidden');
-          signUpBtn.classList.remove('hidden');
-          profileLink.classList.add('hidden');
-          logoutBtn.classList.add('hidden');
-        }
+  if (loginBtn) loginBtn.classList.add('hidden');
+  if (signUpBtn) signUpBtn.classList.add('hidden');
+  if (profileLink) profileLink.classList.remove('hidden');
+  if (logoutBtn) logoutBtn.classList.remove('hidden');
+  loadDraft();
+} else {
+  if (loginBtn) loginBtn.classList.remove('hidden');
+  if (signUpBtn) signUpBtn.classList.remove('hidden');
+  if (profileLink) profileLink.classList.add('hidden');
+  if (logoutBtn) logoutBtn.classList.add('hidden');
+}
       } catch (error) {
         console.error('Error initializing auth:', error);
         showModal(errorModal, 'Error checking authentication status.');
@@ -561,9 +583,15 @@
     });
 
     // Mobile Menu Toggle
-    menuToggle.addEventListener('click', () => {
-      navMenu.classList.toggle('active');
-    });
+  menuToggle.addEventListener('click', () => {
+  if (mobileMenu.classList.contains('hidden')) {
+    mobileMenu.classList.remove('hidden');
+    mobileMenu.classList.add('show');
+  } else {
+    mobileMenu.classList.add('hidden');
+    mobileMenu.classList.remove('show');
+  }
+});
 
     // Auto-resize Textarea
     messageTextarea.addEventListener('input', function() {
