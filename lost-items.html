@@ -347,10 +347,8 @@
         const { data, error } = await supabase
           .from('lost_items')
           .select(`
-            id, title, description, location, status, image_url, created_at, category, contact_info, date_lost,
-            users (whatsapp)
+            id, title, description, location, status, image_url, created_at, category, contact_info, date_lost
           `)
-          .or(`status.eq.claimed,created_at.gte.${oneDayAgo}`)
           .order('created_at', { ascending: false });
         if (error) {
           throw new Error(`Failed to fetch items: ${error.message} (code: ${error.code})`);
@@ -405,7 +403,7 @@
         };
 
         const buttonText = item.status === 'found' ? 'Claim Item' : 'Contact Owner';
-        const whatsappUrl = `https://wa.me/${item.users?.whatsapp || ''}?text=${encodeURIComponent(`Hi, I'm interested in ${item.status === 'found' ? 'claiming' : 'discussing'} your item: ${item.title}`)}`;
+        const whatsappUrl = `https://wa.me/${item.contact_info || ''}?text=${encodeURIComponent(`Hi, I think I have or found your item: ${item.title}`)}`;
 
         card.innerHTML = `
           <div class="relative group">

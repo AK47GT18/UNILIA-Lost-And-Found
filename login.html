@@ -174,7 +174,7 @@
 
     async function resetPassword(email) {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: 'https://ak47gt18.github.io/UNILIA-Lost-And-Found/reset-password.html'
+        redirectTo: 'https://ak47gt18.github.io/UNILIA-Lost-And-Found/forgot-password.html'
       });
       if (error) {
         throw new Error(error.message.includes('User not found') 
