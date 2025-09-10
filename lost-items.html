@@ -415,6 +415,7 @@
                      class="w-full h-full object-cover transition-all duration-500 group-hover:scale-110" 
                      alt="${item.title}"
                      loading="lazy"
+                     fetchpriority="high"
                      onerror="this.parentElement.innerHTML = document.querySelector('#fallbackImage').innerHTML">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
@@ -477,8 +478,8 @@
               </div>
             </div>
 
-            ${item.users?.whatsapp && item.status !== 'claimed' ? `
-              <button onclick="handleContact('${whatsappUrl}')" 
+            ${item.status !== 'claimed' ? `
+              <button onclick="handleContact('${whatsappUrl}')"
                       class="w-full px-6 py-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 
                              transition-all duration-300 transform hover:scale-102 hover:shadow-lg
                              focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 
@@ -488,13 +489,9 @@
                 </svg>
                 <span>${buttonText}</span>
               </button>
-            ` : item.status === 'claimed' ? `
-              <div class="text-center text-sm font-medium text-gray-500 mt-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
-                This item has been claimed
-              </div>
             ` : `
               <div class="text-center text-sm font-medium text-gray-500 mt-4 py-3 bg-gray-50 rounded-xl border border-gray-100">
-                Contact information not available
+                This item has been claimed
               </div>
             `}
           </div>
